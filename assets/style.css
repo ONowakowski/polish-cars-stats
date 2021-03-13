@@ -8,3 +8,11 @@
   color: #FFFAFA;
 }
 
+.navbar {
+  min-height: 10px;
+  max-height: 10px;
+}
+
+.content {
+    margin-top: 10 px;
+}

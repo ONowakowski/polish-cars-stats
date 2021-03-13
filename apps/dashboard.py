@@ -6,15 +6,15 @@ import dash_html_components as html
 import plotly.express as px
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
+from app import app
+import pathlib
 
-df1 = pd.read_csv('preprocessed_otomoto_data.csv')
-df2 = pd.read_csv('preprocessed_otomoto_data_1.csv')
+PATH = pathlib.Path(__file__).parent
+DATA_PATH = PATH.joinpath("../datasets").resolve()
+
+df1 = pd.read_csv(DATA_PATH.joinpath('preprocessed_otomoto_data.csv'))
+df2 = pd.read_csv(DATA_PATH.joinpath('preprocessed_otomoto_data_1.csv'))
 df = df1.append(df2)
-
-app = dash.Dash(name=__name__, external_stylesheets=[dbc.themes.DARKLY],
-                meta_tags=[{'name': 'viewport',
-                            'content': 'width=device-width, initial-scale=1.0'}])
-server = app.server
 
 
 fig = px.histogram(df, x=df.price)
@@ -89,13 +89,11 @@ card_make_price_graph = dbc.Card([
     ])
 ], className="card text-white bg-primary")
 
-app.layout = html.Div(className='p-4 bg-secondary', children=[
+layout = html.Div(className='p-4', #bg-secondary
+                  children=[
     dbc.Row([
-        dbc.Col([
-            html.H3('Oferty sprzedaży samochodów w Polsce', className="text-white mb-4")],
-            width={'size': 6, 'offset': 3},
-        )
-    ]),
+        html.H3('Oferty sprzedaży samochodów w Polsce', className="text-white mb-4")
+    ], justify='center'),
     dbc.Row([
         dbc.Col([
             dbc.Card([f'Ilość analizowanych ofert: {df.shape[0]}'],
@@ -185,7 +183,6 @@ def update_output_graph(input_range_value, input_radio_value, input_makes_value)
     else:
         price_max = (max_val - half_input)/second_range * label_second_range + labels[5]
 
-
     if input_radio_value == 'USED':
         dff = df.loc[(df.price >= price_min) & (df.price <= price_max) & (df.condition == 'Używane')]
     elif input_radio_value == 'NEW':
@@ -207,7 +204,3 @@ def update_output_graph(input_range_value, input_radio_value, input_makes_value)
     sum_of_cars_title = f'Łącznie ofert: {dff["offer_id"].count()}'
 
     return fig, title, sum_of_cars_title
-
-
-if __name__ == '__main__':
-    app.run_server(dev_tools_hot_reload=False)
