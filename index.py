@@ -8,6 +8,7 @@ from app import server
 
 from apps import dashboard, model_stats
 
+
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     dbc.NavbarSimple(children=[
