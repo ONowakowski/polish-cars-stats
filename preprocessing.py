@@ -3,7 +3,7 @@ import pandas as pd
 
 api = Api()
 
-df_raw = pd.read_csv('otomoto_data.csv')
+df_raw = pd.read_csv('otomoto_data_2.csv')
 df = df_raw.copy()
 
 # eng_capacity always has cm3, I can erase it
@@ -45,4 +45,4 @@ df.loc[df.version.isna(), 'version'] = 'Nie podano'
 df.loc[df.generation.isna(), 'generation'] = 'Nie podano'
 df.loc[df.country_of_origin.isna(), 'country_of_origin'] = 'Nie podano'
 
-df.to_csv('preprocessed_otomoto_data.csv')
+df.to_csv('preprocessed_otomoto_data_2.csv')

@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import dash
 import dash_html_components as html
@@ -13,7 +14,9 @@ DATA_PATH = PATH.joinpath("../datasets").resolve()
 
 df1 = pd.read_csv(DATA_PATH.joinpath('preprocessed_otomoto_data.csv'))
 df2 = pd.read_csv(DATA_PATH.joinpath('preprocessed_otomoto_data_1.csv'))
-df = df1.append(df2)
+df3 = pd.read_csv(DATA_PATH.joinpath('preprocessed_otomoto_data_2.csv'))
+
+df = df1.append([df2, df3])
 
 layout = html.Div(className='p-4',  # bg-secondary
                   children=[
@@ -24,25 +27,41 @@ layout = html.Div(className='p-4',  # bg-secondary
                           dbc.Col(width=4, children=[
                               html.H6('Marka:'),
                               dcc.Dropdown(id='make-dropdown',
-                                           options=[dict(label=make, value=make) for make in df['make'].unique()]
-                                           ),
+                                           options=[dict(label=make, value=make) for make in df['make'].unique()],
+                                           className='mb-3'),
                               html.H6('Model:'),
                               dcc.Dropdown(id='model-dropdown',
-                                           options=[]),
+                                           options=[],
+                                           className='mb-3'),
                               html.H6('Wersja:'),
                               dcc.Dropdown(id='version-dropdown',
-                                           options=[]),
+                                           options=[],
+                                           className='mb-3'),
                               html.H6('Rok produkcji:'),
                               dcc.Dropdown(id='year-dropdown',
-                                           options=[])
+                                           options=[],
+                                           className='mb-3'),
+                              dcc.RadioItems(id='condition-radioitems',
+                                             inputStyle={"margin-right": "5px", "margin-left": "3px"},
+                                             options=[
+                                                 {'label': 'Wszystkie', 'value': 'ALL'},
+                                                 {'label': 'Używane', 'value': 'USED'},
+                                                 {'label': 'Nowe', 'value': 'NEW'}],
+                                             value='ALL'
+                                             )
                           ]),
                           dbc.Col([
                               dbc.Card([
-                                  html.H5(id='output-name-of-car'),
-                                  dbc.Progress(value=25, color="success", className="mb-3"),
-                                  dbc.Progress(value=50, color="warning", className="mb-3"),
-                                  dbc.Progress(value=75, color="danger", className="mb-3"),
-                                  dbc.Progress(value=100, color="info")],
+                                  html.H5(id='output-name-of-car', children=' '),
+                                  html.H6(id='cars-quantity', children=' '),
+                                  dbc.Progress(id='1st-quantile', children='', value=25, color="success",
+                                               className="mb-3"),
+                                  dbc.Progress(id='2nd-quantile', children='', value=50, color="info",
+                                               className="mb-3"),
+                                  dbc.Progress(id='3rd-quantile', children='', value=75, color="warning",
+                                               className="mb-3"),
+                                  dbc.Progress(id='4th-quantile', children='', value=100, color="danger",
+                                               className="mb-3")],
                                   body=True, className="card text-white bg-primary")
                           ])
                       ])
@@ -105,22 +124,54 @@ def update_year_dropdown(chosen_make, chosen_model, chosen_version):
 
 @app.callback(
     Output(component_id='output-name-of-car', component_property='children'),
+    Output(component_id='1st-quantile', component_property='children'),
+    Output(component_id='2nd-quantile', component_property='children'),
+    Output(component_id='3rd-quantile', component_property='children'),
+    Output(component_id='4th-quantile', component_property='children'),
+    Output(component_id='cars-quantity', component_property='children'),
     Input(component_id='make-dropdown', component_property='value'),
     Input(component_id='model-dropdown', component_property='value'),
     Input(component_id='version-dropdown', component_property='value'),
-    Input(component_id='year-dropdown', component_property='value')
+    Input(component_id='year-dropdown', component_property='value'),
+    Input(component_id='condition-radioitems', component_property='value')
+
 )
-def update_prices(make, model, version, year):
+def update_prices(make, model, version, year, condition):
     if make is None:
-        return ''
+        return '', '', '', '', '', ''
 
-    if model is None:
-        return make
+    elif model is None:
+        dfg = df.loc[df['make'] == make]
+        output_name = make
 
-    if version is None:
-        return f'{make} {model}'
+    elif version is None:
+        dfg = df.loc[(df['make'] == make) & (df['model'] == model)]
+        output_name = f'{make} {model}'
 
-    if year is None:
-        return f'{make} {model} {version}'
+    elif year is None:
+        dfg = df.loc[(df['make'] == make) & (df['model'] == model) & (df['version'] == version)]
+        output_name = f'{make} {model} {version}'
 
-    return f'{make} {model} {version} r. {year}'
+    else:
+        dfg = df.loc[(df['make'] == make) & (df['model'] == model) &
+                     (df['version'] == version) & (df['prod_year'] == year)]
+
+        output_name = f'{make} {model} {version} r. {year}'
+
+    if condition == 'USED':
+        dfg = dfg.loc[(dfg.condition == 'Używane')]
+        if dfg.empty:
+            return output_name, '', '', '', '', 'brak używanych w bazie'
+    elif condition == 'NEW':
+        dfg = dfg.loc[(dfg.condition == 'Nowe')]
+        if dfg.empty:
+            return output_name, '', '', '', '', 'brak nowych w bazie'
+
+
+    q1 = f' max {np.quantile(dfg.price, 0.25)} zł'
+    q2 = f' max {np.quantile(dfg.price, 0.5)} zł'
+    q3 = f' max {np.quantile(dfg.price, 0.75)} zł'
+    q4 = f' max {np.quantile(dfg.price, 1)} zł'
+    quantity = f'Na podstawie {len(dfg)} szt.'
+
+    return output_name, q1, q2, q3, q4, quantity

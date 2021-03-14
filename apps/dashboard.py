@@ -14,7 +14,9 @@ DATA_PATH = PATH.joinpath("../datasets").resolve()
 
 df1 = pd.read_csv(DATA_PATH.joinpath('preprocessed_otomoto_data.csv'))
 df2 = pd.read_csv(DATA_PATH.joinpath('preprocessed_otomoto_data_1.csv'))
-df = df1.append(df2)
+df3 = pd.read_csv(DATA_PATH.joinpath('preprocessed_otomoto_data_2.csv'))
+
+df = df1.append([df2, df3])
 
 
 fig = px.histogram(df, x=df.price)
