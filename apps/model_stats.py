@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import dash
 import dash_html_components as html
 import dash_core_components as dcc
@@ -49,6 +50,9 @@ layout = html.Div(className='p-4',  # bg-secondary
                                                  {'label': 'Nowe', 'value': 'NEW'}],
                                              value='ALL'
                                              )
+                          ]),
+                          dbc.Col(width=4, children=[
+                              dcc.Graph(id='price-histogram-for-model')
                           ]),
                           dbc.Col([
                               dbc.Card([
@@ -129,6 +133,7 @@ def update_year_dropdown(chosen_make, chosen_model, chosen_version):
     Output(component_id='3rd-quantile', component_property='children'),
     Output(component_id='4th-quantile', component_property='children'),
     Output(component_id='cars-quantity', component_property='children'),
+    Output(component_id='price-histogram-for-model', component_property='figure'),
     Input(component_id='make-dropdown', component_property='value'),
     Input(component_id='model-dropdown', component_property='value'),
     Input(component_id='version-dropdown', component_property='value'),
@@ -137,8 +142,11 @@ def update_year_dropdown(chosen_make, chosen_model, chosen_version):
 
 )
 def update_prices(make, model, version, year, condition):
+    fig = px.histogram()
+
     if make is None:
-        return '', '', '', '', '', ''
+        dfg = df
+        output_name = 'Wszystkie samochody'
 
     elif model is None:
         dfg = df.loc[df['make'] == make]
@@ -161,17 +169,17 @@ def update_prices(make, model, version, year, condition):
     if condition == 'USED':
         dfg = dfg.loc[(dfg.condition == 'Używane')]
         if dfg.empty:
-            return output_name, '', '', '', '', 'brak używanych w bazie'
+            return output_name, '', '', '', '', 'brak używanych w bazie', fig
     elif condition == 'NEW':
         dfg = dfg.loc[(dfg.condition == 'Nowe')]
         if dfg.empty:
-            return output_name, '', '', '', '', 'brak nowych w bazie'
-
+            return output_name, '', '', '', '', 'brak nowych w bazie', fig
 
     q1 = f' max {np.quantile(dfg.price, 0.25)} zł'
     q2 = f' max {np.quantile(dfg.price, 0.5)} zł'
     q3 = f' max {np.quantile(dfg.price, 0.75)} zł'
     q4 = f' max {np.quantile(dfg.price, 1)} zł'
     quantity = f'Na podstawie {len(dfg)} szt.'
+    fig = px.histogram(dfg, x='price')
 
-    return output_name, q1, q2, q3, q4, quantity
+    return output_name, q1, q2, q3, q4, quantity, fig
