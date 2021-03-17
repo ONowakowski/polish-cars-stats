@@ -19,57 +19,56 @@ df3 = pd.read_csv(DATA_PATH.joinpath('preprocessed_otomoto_data_2.csv'))
 
 df = df1.append([df2, df3])
 
-layout = html.Div(className='p-4',  # bg-secondary
-                  children=[
-                      dbc.Row([
-                          html.H3('Statystyki dla wybranego samochodu', className="text-white mb-4")
-                      ], justify='center'),
-                      dbc.Row([
-                          dbc.Col(width=4, children=[
-                              html.H6('Marka:'),
-                              dcc.Dropdown(id='make-dropdown',
-                                           options=[dict(label=make, value=make) for make in df['make'].unique()],
-                                           className='mb-3'),
-                              html.H6('Model:'),
-                              dcc.Dropdown(id='model-dropdown',
-                                           options=[],
-                                           className='mb-3'),
-                              html.H6('Wersja:'),
-                              dcc.Dropdown(id='version-dropdown',
-                                           options=[],
-                                           className='mb-3'),
-                              html.H6('Rok produkcji:'),
-                              dcc.Dropdown(id='year-dropdown',
-                                           options=[],
-                                           className='mb-3'),
-                              dcc.RadioItems(id='condition-radioitems',
-                                             inputStyle={"margin-right": "5px", "margin-left": "3px"},
-                                             options=[
-                                                 {'label': 'Wszystkie', 'value': 'ALL'},
-                                                 {'label': 'Używane', 'value': 'USED'},
-                                                 {'label': 'Nowe', 'value': 'NEW'}],
-                                             value='ALL'
-                                             )
-                          ]),
-                          dbc.Col(width=4, children=[
-                              dcc.Graph(id='price-histogram-for-model')
-                          ]),
-                          dbc.Col([
-                              dbc.Card([
-                                  html.H5(id='output-name-of-car', children=' '),
-                                  html.H6(id='cars-quantity', children=' '),
-                                  dbc.Progress(id='1st-quantile', children='', value=25, color="success",
-                                               className="mb-3"),
-                                  dbc.Progress(id='2nd-quantile', children='', value=50, color="info",
-                                               className="mb-3"),
-                                  dbc.Progress(id='3rd-quantile', children='', value=75, color="warning",
-                                               className="mb-3"),
-                                  dbc.Progress(id='4th-quantile', children='', value=100, color="danger",
-                                               className="mb-3")],
-                                  body=True, className="card text-white bg-primary")
-                          ])
-                      ])
-                  ])
+layout = html.Div(className='p-4', children=[
+    dbc.Row([
+        html.H3('Statystyki dla wybranego samochodu', className="text-white mb-4")
+    ], justify='center'),
+    dbc.Row([
+        dbc.Col(width=4, children=[
+            html.H6('Marka:'),
+            dcc.Dropdown(id='make-dropdown',
+                         options=[dict(label=make, value=make) for make in df['make'].unique()],
+                         className='mb-3'),
+            html.H6('Model:'),
+            dcc.Dropdown(id='model-dropdown',
+                         options=[],
+                         className='mb-3'),
+            html.H6('Wersja:'),
+            dcc.Dropdown(id='version-dropdown',
+                         options=[],
+                         className='mb-3'),
+            html.H6('Rok produkcji:'),
+            dcc.Dropdown(id='year-dropdown',
+                         options=[],
+                         className='mb-3'),
+            dcc.RadioItems(id='condition-radioitems',
+                           inputStyle={"margin-right": "5px", "margin-left": "3px"},
+                           options=[
+                               {'label': 'Wszystkie', 'value': 'ALL'},
+                               {'label': 'Używane', 'value': 'USED'},
+                               {'label': 'Nowe', 'value': 'NEW'}],
+                           value='ALL'
+                           )
+        ]),
+        dbc.Col(width=4, children=[
+            dcc.Graph(id='price-histogram-for-model')
+        ]),
+        dbc.Col([
+            dbc.Card([
+                html.H5(id='output-name-of-car', children=' '),
+                html.H6(id='cars-quantity', children=' '),
+                dbc.Progress(id='1st-quantile', children='', value=25, color="success",
+                             className="mb-3"),
+                dbc.Progress(id='2nd-quantile', children='', value=50, color="info",
+                             className="mb-3"),
+                dbc.Progress(id='3rd-quantile', children='', value=75, color="warning",
+                             className="mb-3"),
+                dbc.Progress(id='4th-quantile', children='', value=100, color="danger",
+                             className="mb-3")],
+                body=True, className="card text-white bg-primary")
+        ])
+    ])
+])
 
 
 @app.callback(
