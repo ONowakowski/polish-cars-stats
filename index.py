@@ -24,9 +24,9 @@ app.layout = html.Div([
         html.P(style={'text-align': 'center'},
                children=["Autor: Oskar Nowakowski, E-mail: oskar.r.nowakowski@gmail.com, Kod źródłowy: ",
                          html.A(href="https://github.com/ONowakowski/polish-cars-stats",
-                                children="GitHub",target='_blank'),
+                                children="GitHub", target='_blank'),
                          html.Br(),
-                         "Dane zostały zebrane z portalu otomoto.pl i służą jedynie do statystyk."
+                         "Dane zostały zebrane z portalu otomoto.pl (marzec/kwiecień 2021) i służą jedynie do statystyk."
                          ]),
 
     ])

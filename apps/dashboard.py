@@ -8,7 +8,6 @@ from dash.dependencies import Input, Output
 from app import app
 import pathlib
 
-
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("../datasets").resolve()
 
