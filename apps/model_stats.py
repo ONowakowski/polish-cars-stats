@@ -180,5 +180,9 @@ def update_prices(make, model, version, year, condition):
     q4 = f' max {np.quantile(dfg.price, 1)} zł'
     quantity = f'Na podstawie {len(dfg)} szt.'
     fig = px.histogram(dfg, x='price')
+    fig.update_traces(marker_color='orange',
+                      hovertemplate='Cena: %{x} <br>Ilość: %{y}')
+    fig.update_layout(xaxis_title="Cena (PLN)",
+                      yaxis_title="Ilość",)
 
     return output_name, q1, q2, q3, q4, quantity, fig

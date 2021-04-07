@@ -1,12 +1,9 @@
-import numpy as np
 import pandas as pd
-import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output
 from app import app
 import pathlib
 
@@ -22,12 +19,21 @@ df = df1.append([df2, df3])
 df_mileage = df.loc[df.condition == 'Używane', ['mileage', 'prod_year']].groupby(['prod_year'], as_index=False).mean()
 df_mileage = df_mileage.rename(columns={'prod_year': 'prod_year', 'mileage': 'mileage_avg'})
 fig_1 = px.bar(df_mileage, x='prod_year', y='mileage_avg', log_y=True, text='mileage_avg')
-fig_1.update_traces(texttemplate='%{text:.2s}', textposition='outside')
-fig_1.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+fig_1.update_traces(texttemplate='%{text:.2s}', textposition='outside', marker_color='orange',
+                    hovertemplate='Rok: %{x} <br>Przebieg: %{y:.3s}')
+fig_1.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                    xaxis_title="Rok produkcji",
+                    yaxis_title="Średni przebieg (km)")
 
 df_capacity = df[['eng_capacity', 'prod_year']].groupby(['prod_year'], as_index=False).mean()
 df_capacity = df_capacity.rename(columns={'prod_year': 'prod_year', 'eng_capacity': 'eng_capacity_avg'})
 fig_2 = px.scatter(df_capacity, x='prod_year', y='eng_capacity_avg')
+fig_2.update_traces(hovertemplate='Rok: %{x} <br>Średnia pojemność: %{y:.0f} cm<sup>3</sup>', marker_color='orange')
+fig_2.update_layout(
+    xaxis_title="Rok produkcji",
+    yaxis_title="Średnia pojemność silnika (cm<sup>3</sup>)",
+)
+
 
 df_country = df.country_of_origin.value_counts().reset_index()
 df_country.columns = ['country', 'count']
@@ -40,6 +46,7 @@ fig_3 = go.Figure(
     data=go.Pie(labels=df_country['country'], values=df_country['count'])
 )
 
+
 df_gearbox = df.gearbox.value_counts().rename_axis('gearbox').reset_index(name='count')
 fig_4 = go.Figure(
     data=go.Pie(labels=df_gearbox['gearbox'], values=df_gearbox['count'])
@@ -51,8 +58,19 @@ df_models = df_models.full_model_name.value_counts()[:10].reset_index()
 df_models.columns = ['car', 'count']
 
 fig_5 = px.bar(df_models, x='car', y='count', text='count')
+fig_5.update_traces(hovertemplate='%{x} <br>Ilość: %{y}', marker_color='orange')
+fig_5.update_layout(
+    xaxis_title="Model",
+    yaxis_title="Ilość",
+)
 
 fig_6 = px.histogram(x=df.eng_power, nbins=100)
+fig_6.update_traces(hovertemplate='Moc: %{x} km <br>Ilość: %{y}', marker_color='orange')
+fig_6.update_layout(
+    xaxis_title="Moc silnika",
+    yaxis_title="Ilość",
+)
+
 
 df_body = df.body.value_counts().reset_index()
 df_body.columns = ['body', 'count']
@@ -65,7 +83,14 @@ df_fuel = df.fuel.value_counts().reset_index()
 df_fuel.columns = ['fuel', 'count']
 
 fig_8 = px.bar(df_fuel, x='fuel', y='count', log_y=True, text='count')
-fig_8.update_traces(textposition='outside')
+fig_8.update_traces(textposition='outside',
+                    hovertemplate='%{x} <br>Ilość: %{y}',
+                    marker_color='orange')
+fig_8.update_layout(
+    xaxis_title="Paliwo",
+    yaxis_title="Ilość",
+)
+
 
 layout = html.Div(className='p-4', children=[
     dbc.Row([

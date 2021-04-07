@@ -1,9 +1,10 @@
 from exchangeratesapi import Api
 import pandas as pd
+import pathlib
 
 api = Api()
 
-df_raw = pd.read_csv('otomoto_data_2.csv')
+df_raw = pd.read_csv('otomoto_data.csv')
 df = df_raw.copy()
 
 # eng_capacity always has cm3, I can erase it
@@ -45,4 +46,6 @@ df.loc[df.version.isna(), 'version'] = 'Nie podano'
 df.loc[df.generation.isna(), 'generation'] = 'Nie podano'
 df.loc[df.country_of_origin.isna(), 'country_of_origin'] = 'Nie podano'
 
-df.to_csv('preprocessed_otomoto_data_2.csv')
+PATH = pathlib.Path(__file__).parent
+DATA_PATH = PATH.joinpath("../datasets").resolve()
+df.to_csv(DATA_PATH.joinpath('preprocessed_otomoto_data.csv'))

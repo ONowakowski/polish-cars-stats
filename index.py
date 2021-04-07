@@ -8,7 +8,6 @@ from app import server
 
 from apps import dashboard, model_stats, more_stats
 
-
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     dbc.NavbarSimple(children=[
@@ -20,7 +19,17 @@ app.layout = html.Div([
         dark=True,
         expand='xs'
     ),
-    html.Div(id='content', children=[])
+    html.Div(id='content', children=[]),
+    html.Footer(id='footer', children=[
+        html.P(style={'text-align': 'center'},
+               children=["Autor: Oskar Nowakowski, E-mail: oskar.r.nowakowski@gmail.com, Kod źródłowy: ",
+                         html.A(href="https://github.com/ONowakowski/polish-cars-stats",
+                                children="GitHub",target='_blank'),
+                         html.Br(),
+                         "Dane zostały zebrane z portalu otomoto.pl i służą jedynie do statystyk."
+                         ]),
+
+    ])
 ])
 
 
